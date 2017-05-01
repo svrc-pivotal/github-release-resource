@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
+	"crypto/tls"
 
 	"github.com/google/go-github/github"
 )
@@ -164,8 +165,12 @@ func (c *InCommand) downloadFile(url, destPath string) error {
 		return err
 	}
 	defer out.Close()
+  	tr := &http.Transport{
+        TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+    }
+    skipTlsClient := &http.Client{Transport: tr}
 
-	resp, err := http.Get(url)
+	resp, err := skipTlsClient.Get(url)
 	if err != nil {
 		return err
 	}
